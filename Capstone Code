@@ -1,0 +1,146 @@
+tickets <- read.csv("C:/Users/Sindhuri/Downloads/archive (4)/customer_support_tickets.csv", comment.char="#")
+View(tickets)
+
+
+library(shiny)
+
+# Define UI
+ui <- fluidPage(
+  titlePanel("Customer Ticket Information"),
+  
+  sidebarLayout(
+    sidebarPanel(
+      textInput("ticket_id", "Enter Ticket ID:"),
+      textInput("customer_name", "Enter Customer Name:"),
+      textInput("customer_email", "Enter Customer Email:"),
+      numericInput("customer_age", "Enter Customer Age:", value = NA, min = 0),
+      selectInput("customer_gender", "Select Customer Gender:", choices = c("Male", "Female")),
+      textInput("product_purchased", "Enter Product Purchased:"),
+      actionButton("submit", "Submit")
+    ),
+    
+    mainPanel(
+      h3("Customer Details"),
+      verbatimTextOutput("customer_details")
+    )
+  )
+)
+
+# Define server logic
+server <- function(input, output) {
+  observeEvent(input$submit, {
+    # Filter the dataset based on user input
+    filtered_data <- tickets[tickets$Ticket.ID == as.numeric(input$ticket_id) & 
+                               tickets$Customer.Name == input$customer_name & 
+                               tickets$Customer.Email == input$customer_email & 
+                               tickets$Customer.Age == input$customer_age & 
+                               tickets$Customer.Gender == input$customer_gender & 
+                               tickets$Product.Purchased == input$product_purchased, ]
+    
+    # Prepare output
+    if (nrow(filtered_data) > 0) {
+      output$customer_details <- renderText({
+        paste("Date of Purchase:", filtered_data$Date.of.Purchase,
+              "\nTicket Type:", filtered_data$Ticket.Type,
+              "\nTicket Subject:", filtered_data$Ticket.Subject)
+      })
+    } else {
+      output$customer_details <- renderText("No matching records found.")
+    }
+  })
+}
+
+# Run the application 
+shinyApp(ui = ui, server = server)
+
+
+
+
+
+
+
+library(dplyr)
+library(ggplot2)
+
+# Load the dataset
+tickets <- read.csv("C:/Users/Sindhuri/Downloads/archive (4)/customer_support_tickets.csv", comment.char="#")
+
+# Filter for male customers
+male_tickets <- tickets %>%
+  filter(Customer.Gender == "Male") %>%
+  select(Product.Purchased, Ticket.Status)
+
+
+
+
+
+
+
+# Install ggplot2 if it's not already installed
+if (!requireNamespace("ggplot2", quietly = TRUE)) {
+  install.packages("ggplot2")
+}
+
+# Load necessary libraries
+library(dplyr)
+library(ggplot2)
+
+# Load the dataset
+tickets <- read.csv("C:/Users/Sindhuri/Downloads/archive (4)/customer_support_tickets.csv", comment.char="#")
+
+# Filter for male customers
+male_tickets <- tickets %>%
+  filter(Customer.Gender == "Male") %>%
+  select(Product.Purchased, Ticket.Status)
+
+# Summarize the data
+summary_data <- male_tickets %>%
+  group_by(Product.Purchased, Ticket.Status) %>%
+  summarise(Count = n(), .groups = 'drop')
+
+# Create a stacked bar plot
+ggplot(summary_data, aes(x = Product.Purchased, y = Count, fill = Ticket.Status)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Ticket Status by Product Purchased for Male Customers",
+       x = "Product Purchased",
+       y = "Number of Tickets") +
+  theme_minimal() +
+  scale_fill_brewer(palette = "Set1")
+
+
+
+
+
+
+
+
+# Install ggplot2 if it's not already installed
+if (!requireNamespace("ggplot2", quietly = TRUE)) {
+  install.packages("ggplot2")
+}
+
+# Load necessary libraries
+library(dplyr)
+library(ggplot2)
+
+# Load the dataset
+tickets <- read.csv("C:/Users/Sindhuri/Downloads/archive (4)/customer_support_tickets.csv", comment.char="#")
+
+# Filter for female customers
+female_tickets <- tickets %>%
+  filter(Customer.Gender == "Female") %>%
+  select(Product.Purchased, Ticket.Status)
+
+# Summarize the data
+summary_data_female <- female_tickets %>%
+  group_by(Product.Purchased, Ticket.Status) %>%
+  summarise(Count = n(), .groups = 'drop')
+
+# Create a stacked bar plot for female customers
+ggplot(summary_data_female, aes(x = Product.Purchased, y = Count, fill = Ticket.Status)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Ticket Status by Product Purchased for Female Customers",
+       x = "Product Purchased",
+       y = "Number of Tickets") +
+  theme_minimal() +
+  scale_fill_brewer(palette = "Set1")
